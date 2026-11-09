@@ -28,3 +28,5 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Root `index.html` is an exact copy of `public/chronosphere.html` for GitHub Pages; update both together.
