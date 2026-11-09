@@ -12,10 +12,10 @@ function loadApp() {
     url: "http://localhost/",
   });
   const doc = dom.window.document;
-  const marker = doc.querySelector<HTMLElement>("#markers .marker")!;
+  const marker = doc.querySelector("#markers .marker") as HTMLElement;
   const id = marker.dataset.id!;
   marker.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
-  const reacts = () => Array.from(doc.querySelectorAll<HTMLElement>(".reacts button"));
+  const reacts = () => Array.from(doc.querySelectorAll(".reacts button")) as HTMLElement[];
   const btnOf = (key: string) => reacts().find((b) => b.dataset.r === key)!;
   const countOf = (key: string) => {
     const btn = btnOf(key);
@@ -75,15 +75,15 @@ describe("emoji reactions", () => {
       pretendToBeVisual: true,
       url: "http://localhost/",
       storageQuota: 10_000,
-      beforeParse(win) {
+      beforeParse(win: { localStorage: { setItem(key: string, value: string): void } }) {
         win.localStorage.setItem("chronosphere:myvotes", stored!);
       },
     });
     const doc = second.window.document;
-    doc
-      .querySelector<HTMLElement>("#markers .marker")!
-      .dispatchEvent(new second.window.MouseEvent("click", { bubbles: true }));
-    const btn = doc.querySelector<HTMLElement>(".reacts button[data-r='b']")!;
+    (doc.querySelector("#markers .marker") as HTMLElement).dispatchEvent(
+      new second.window.MouseEvent("click", { bubbles: true }),
+    );
+    const btn = doc.querySelector(".reacts button[data-r='b']") as HTMLElement;
     expect(btn.classList.contains("active")).toBe(true);
   });
 });
