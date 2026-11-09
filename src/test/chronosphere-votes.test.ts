@@ -13,10 +13,10 @@ function loadApp() {
   });
   const doc = dom.window.document;
   const marker = doc.querySelector("#markers .marker") as HTMLElement;
-  const id = marker.dataset.id!;
+  const id = marker.dataset["id"]!;
   marker.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
   const reacts = () => Array.from(doc.querySelectorAll(".reacts button")) as HTMLElement[];
-  const btnOf = (key: string) => reacts().find((b) => b.dataset.r === key)!;
+  const btnOf = (key: string) => reacts().find((b) => b.dataset["r"] === key)!;
   const countOf = (key: string) => {
     const btn = btnOf(key);
     return Number(btn.textContent!.match(/(\d+)\s*$/)![1]);
