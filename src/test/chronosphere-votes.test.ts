@@ -16,16 +16,15 @@ function loadApp() {
   const id = marker.dataset.id!;
   marker.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
   const reacts = () => Array.from(doc.querySelectorAll<HTMLElement>(".reacts button"));
+  const btnOf = (key: string) => reacts().find((b) => b.dataset.r === key)!;
   const countOf = (key: string) => {
-    const btn = reacts().find((b) => b.dataset.r === key)!;
+    const btn = btnOf(key);
     return Number(btn.textContent!.match(/(\d+)\s*$/)![1]);
   };
   const clickEmoji = (key: string) => {
-    const btn = reacts().find((b) => b.dataset.r === key)!;
-    btn.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
-    return btn;
+    btnOf(key).dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
   };
-  return { dom, doc, id, countOf, clickEmoji };
+  return { dom, doc, id, btnOf, countOf, clickEmoji };
 }
 
 describe("emoji reactions", () => {
@@ -44,12 +43,12 @@ describe("emoji reactions", () => {
   });
 
   it("marks the emoji as voted while the vote is held", () => {
-    const { clickEmoji } = loadApp();
-    expect(clickEmoji("w").classList.contains("active")).toBe(false);
+    const { btnOf, clickEmoji } = loadApp();
+    expect(btnOf("w").classList.contains("active")).toBe(false);
     clickEmoji("w");
-    expect(clickEmoji("w").classList.contains("active")).toBe(true);
+    expect(btnOf("w").classList.contains("active")).toBe(true);
     clickEmoji("w");
-    expect(clickEmoji("w").classList.contains("active")).toBe(false);
+    expect(btnOf("w").classList.contains("active")).toBe(false);
   });
 
   it("keeps each emoji's vote independent", () => {
@@ -77,11 +76,11 @@ describe("emoji reactions", () => {
       url: "http://localhost/",
       storageQuota: 10_000,
     });
-    second.dom.window.localStorage.setItem("chronosphere:myvotes", stored!);
-    const doc = second.dom.window.document;
+    second.window.localStorage.setItem("chronosphere:myvotes", stored!);
+    const doc = second.window.document;
     doc
       .querySelector<HTMLElement>("#markers .marker")!
-      .dispatchEvent(new second.dom.window.MouseEvent("click", { bubbles: true }));
+      .dispatchEvent(new second.window.MouseEvent("click", { bubbles: true }));
     const btn = doc.querySelector<HTMLElement>(".reacts button[data-r='b']")!;
     expect(btn.classList.contains("active")).toBe(true);
   });
