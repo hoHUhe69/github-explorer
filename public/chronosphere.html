@@ -417,14 +417,23 @@ $('#slider').oninput=e=>setYear(e.target.value);
 $('#epochs').onclick=e=>{if(e.target.dataset.j)animateTo(+e.target.dataset.j)};
 // dossier
 const votes={};
+const EMOJI={b:'🤯',w:'🧐',q:'❓'};
+const VKEY='chronosphere:myvotes';
+let myVotes=new Set();
+try{myVotes=new Set(JSON.parse(localStorage.getItem(VKEY)||'[]'))}catch(e){}
+function saveVotes(){try{localStorage.setItem(VKEY,JSON.stringify([...myVotes]))}catch(e){}}
+function voted(o,k){return myVotes.has(o.id+':'+k)}
+function tally(o,k){return votes[o.id][k]+(voted(o,k)?1:0)}
+function reactBtn(o,k){return `<button data-r="${k}" class="${voted(o,k)?'active':''}">${EMOJI[k]} ${tally(o,k)}</button>`}
+function toggleVote(o,k){const key=o.id+':'+k;if(myVotes.has(key))myVotes.delete(key);else myVotes.add(key);saveVotes()}
 function open(o){
   animateTo(o.y);const[x,y]=xy(o.lat,o.lon);flyTo(x,y,2.2);
   votes[o.id]=votes[o.id]||{b:20+Math.floor(Math.random()*80),w:10+Math.floor(Math.random()*50),q:5+Math.floor(Math.random()*30)};const v=votes[o.id];
   const related=ODD.filter(p=>p!==o&&p.tags.some(t=>o.tags.includes(t))).slice(0,4);
   $('#dossier').innerHTML=`<div class="meta">Dossier · ${fmt(o.y)}</div><h2>${o.t}</h2><div class="meta">📍 ${o.place}</div><p style="font-size:18px;line-height:1.5">${o.s}</p>
-   <div class="reacts"><button data-r="b">🤯 ${v.b}</button><button data-r="w">🧐 ${v.w}</button><button data-r="q">❓ ${v.q}</button></div>
+   <div class="reacts">${reactBtn(o,'b')}${reactBtn(o,'w')}${reactBtn(o,'q')}</div>
    <div class="meta">Tags: ${o.tags.join(', ')}</div><h3 style="font-family:var(--font)">Rabbit hole →</h3><div class="tags">${related.map(p=>`<button data-go="${p.id}">${p.t}</button>`).join('')}</div>`;
-  $('#dossier').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.r){v[b.dataset.r]++;open.skip=true;b.textContent=b.textContent.replace(/\d+/,v[b.dataset.r]);blip()}if(b.dataset.go)open(ODD.find(p=>p.id===b.dataset.go))};
+  $('#dossier').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.r){const k=b.dataset.r;toggleVote(o,k);b.classList.toggle('active',voted(o,k));b.textContent=`${EMOJI[k]} ${tally(o,k)}`;blip()}if(b.dataset.go)open(ODD.find(p=>p.id===b.dataset.go))};
   $('#drawer').classList.add('open');blip();
 }
 $('#close').onclick=()=>$('#drawer').classList.remove('open');
