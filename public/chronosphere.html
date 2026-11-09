@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chronosphere — The Atlas of Oddities</title>
+<meta name="description" content="Travel through time on a map that changes style with each era, and uncover Earth's strangest true stories." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English:ital@0;1&family=Playfair+Display:wght@600&family=VT323&family=Orbitron:wght@500;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#e9d9b4;--land:#c9a96e;--landStroke:#7a5a2b;--sea:#e9d9b4;--ink:#3b2a14;--accent:#8b3a1a;--panel:#f4e8cc;--font:'Cinzel',serif;--body:'IM Fell English',serif;--grid:rgba(122,90,43,.15);--glow:none}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--body);transition:background .8s,color .8s}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--landStroke)}
+  h1{margin:0;font-family:var(--font);font-size:22px;letter-spacing:.08em;text-shadow:var(--glow)}
+  h1 small{display:block;font-family:var(--body);font-size:12px;opacity:.7;letter-spacing:.2em}
+  button{font-family:var(--font);background:transparent;color:var(--ink);border:1px solid var(--landStroke);padding:6px 12px;cursor:pointer;border-radius:4px;transition:all .3s}
+  button:hover,button.active{background:var(--accent);color:var(--panel)}
+  main{position:relative;height:calc(100% - 64px - 110px)}
+  #map{width:100%;height:100%;cursor:grab;touch-action:none;display:block}
+  #map:active{cursor:grabbing}
+  .land{fill:var(--land);stroke:var(--landStroke);stroke-width:1.2;transition:fill .8s,stroke .8s}
+  .sea{fill:var(--sea);transition:fill .8s}
+  .gridline{stroke:var(--grid);stroke-width:.6;fill:none}
+  .marker{cursor:pointer;transition:opacity .4s}
+  .marker .dot{fill:var(--accent);stroke:var(--panel);stroke-width:1.5}
+  .marker .halo{fill:none;stroke:var(--accent);stroke-width:1;animation:pulse 2s infinite}
+  .marker.dim{opacity:.18}
+  @keyframes pulse{0%{r:6;opacity:1}100%{r:18;opacity:0}}
+  .deco{transition:opacity .8s;opacity:0;pointer-events:none}
+  .deco.on{opacity:1}
+  #sweep{transform-origin:500px 250px;animation:spin 6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #eraLabel{position:absolute;left:20px;top:16px;font-family:var(--font);font-size:28px;text-shadow:var(--glow);pointer-events:none}
+  #eraLabel span{display:block;font-family:var(--body);font-size:14px;opacity:.7}
+  #zoom{position:absolute;left:20px;bottom:16px;display:flex;flex-direction:column;gap:4px}
+  #zoom button{width:34px;height:34px;padding:0;background:var(--panel)}
+  #drawer{position:absolute;top:0;right:0;height:100%;width:min(380px,90vw);background:var(--panel);border-left:2px solid var(--landStroke);padding:24px;overflow:auto;transform:translateX(105%);transition:transform .45s,background .8s;box-shadow:-10px 0 30px rgba(0,0,0,.2)}
+  #drawer.open{transform:none}
+  #drawer h2{font-family:var(--font);margin:.2em 0;text-shadow:var(--glow)}
+  #drawer .meta{opacity:.7;font-style:italic}
+  #drawer .close{position:absolute;top:10px;right:10px}
+  .reacts{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tags button{font-size:12px}
+  footer{height:110px;padding:10px 20px;border-top:1px solid var(--landStroke)}
+  .yearrow{display:flex;align-items:center;gap:16px}
+  input[type=range]{flex:1;accent-color:var(--accent)}
+  #year{font-family:var(--font);font-size:26px;min-width:150px;text-align:right;text-shadow:var(--glow)}
+  .epochs{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .epochs button{flex:1;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>CHRONOSPHERE<small>THE ATLAS OF ODDITIES</small></h1>
+  <div><button id="random">🎲 Random</button> <button id="sound">🔇 Sound off</button></div>
+</header>
+<main>
+  <svg id="map" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet">
+    <g id="world">
+      <rect class="sea" x="-2000" y="-2000" width="5000" height="4500"/>
+      <g id="grid"></g>
+      <g class="deco" id="d-ancient">
+        <text x="140" y="330" font-size="40">🐉</text><text x="640" y="400" font-size="34">🐙</text>
+        <text x="380" y="215" font-family="Cinzel" font-size="14" fill="currentColor" opacity=".6">MARE OCEANVM</text>
+      </g>
+      <g class="deco" id="d-discovery"></g>
+      <g class="deco" id="d-victorian"></g>
+      <g class="deco" id="d-coldwar">
+        <circle cx="500" cy="250" r="100" class="gridline"/><circle cx="500" cy="250" r="200" class="gridline"/><circle cx="500" cy="250" r="300" class="gridline"/>
+        <g id="sweep"><path d="M500 250 L800 250 A300 300 0 0 0 760 100 Z" fill="rgba(80,255,120,.12)"/></g>
+      </g>
+      <g class="deco" id="d-digital"></g>
+      <g id="lands">
+        <path class="land" d="M60,80 L180,60 L300,50 L350,90 L310,130 L280,170 L250,200 L220,230 L200,260 L175,230 L140,190 L110,150 L70,120 Z"/>
+        <path class="land" d="M330,30 L420,25 L400,80 L350,85 Z"/>
+        <path class="land" d="M250,265 L300,260 L360,300 L340,350 L310,400 L290,440 L275,420 L270,360 L255,310 Z"/>
+        <path class="land" d="M470,140 L480,100 L520,80 L580,70 L600,110 L570,135 L530,140 L500,150 Z"/>
+        <path class="land" d="M460,170 L520,155 L560,170 L600,210 L590,260 L570,310 L545,350 L520,340 L505,280 L480,250 L455,220 Z"/>
+        <path class="land" d="M580,70 L700,50 L850,60 L960,90 L900,130 L860,170 L800,200 L760,230 L720,210 L680,200 L640,190 L600,170 L600,110 Z"/>
+        <path class="land" d="M820,320 L880,300 L920,330 L910,370 L860,375 L820,355 Z"/>
+        <path class="land" d="M462,108 L470,100 L474,118 L465,122 Z"/>
+        <path class="land" d="M880,140 L890,130 L895,160 L885,165 Z"/>
+      </g>
+      <g id="markers"></g>
+    </g>
+  </svg>
+  <div id="eraLabel"></div>
+  <div id="zoom"><button id="zin">+</button><button id="zout">−</button><button id="zreset">⟲</button></div>
+  <aside id="drawer"><button class="close" id="close">✕</button><div id="dossier"></div></aside>
+</main>
+<footer>
+  <div class="yearrow"><input id="slider" type="range" min="-3000" max="2026" value="1518" /><div id="year"></div></div>
+  <div class="epochs" id="epochs"></div>
+</footer>
+<script>
+const ERAS=[
+ {id:'ancient',name:'Ancient Antiquity',from:-3000,to:500,jump:-400,v:{bg:'#e6d3a3',land:'#c8a463',landStroke:'#6e4f22',sea:'#e6d3a3',ink:'#3b2a14',accent:'#9c3b14',panel:'#f3e6c4',font:"'Cinzel',serif",body:"'IM Fell English',serif",grid:'rgba(110,79,34,.12)',glow:'none'}},
+ {id:'discovery',name:'Age of Discovery',from:501,to:1750,jump:1518,v:{bg:'#d9c8a0',land:'#b89a62',landStroke:'#4a3418',sea:'#cfe0d6',ink:'#2d1f0e',accent:'#7a1f1f',panel:'#efe3c2',font:"'IM Fell English',serif",body:"'IM Fell English',serif",grid:'rgba(74,52,24,.25)',glow:'none'}},
+ {id:'victorian',name:'Victorian & Industrial',from:1751,to:1940,jump:1859,v:{bg:'#ece7dc',land:'#d8cfbd',landStroke:'#3a3227',sea:'#f4f1ea',ink:'#1f1a14',accent:'#8a5a1e',panel:'#f7f3ea',font:"'Playfair Display',serif",body:"'Playfair Display',serif",grid:'rgba(58,50,39,.15)',glow:'none'}},
+ {id:'coldwar',name:'Cold War & Space Race',from:1941,to:1989,jump:1962,v:{bg:'#04140a',land:'#0c3a1c',landStroke:'#3cff7a',sea:'#04140a',ink:'#7dffa6',accent:'#ffb000',panel:'#061d0f',font:"'VT323',monospace",body:"'VT323',monospace",grid:'rgba(60,255,122,.18)',glow:'0 0 8px #3cff7a'}},
+ {id:'digital',name:'The Digital Age',from:1990,to:2026,jump:2010,v:{bg:'#070916',land:'#11173a',landStroke:'#28e0ff',sea:'#070916',ink:'#d6f6ff',accent:'#ff3fa4',panel:'#0d1130',font:"'Orbitron',sans-serif",body:"'Space Grotesk',sans-serif",grid:'rgba(40,224,255,.12)',glow:'0 0 10px #28e0ff'}}
+];
+const ODD=[
+ {id:'emu',t:'The Great Emu War',y:1932,lat:-30,lon:118,place:'Western Australia',s:'Australian soldiers with machine guns were sent to fight 20,000 emus destroying crops. The emus won.',tags:['animals','military']},
+ {id:'dance',t:'The Dancing Plague',y:1518,lat:48.6,lon:7.7,place:'Strasbourg, France',s:'Hundreds of people danced uncontrollably for days. Authorities hired musicians, thinking more dancing would cure it.',tags:['mystery','medieval']},
+ {id:'molasses',t:'The Great Molasses Flood',y:1919,lat:42.4,lon:-71,place:'Boston, USA',s:'A tank burst, sending a 7.6 m wave of molasses through the streets at 56 km/h.',tags:['disaster','industrial']},
+ {id:'cat',t:'Aoshima Cat Island',y:2015,lat:33.7,lon:132.5,place:'Ehime, Japan',s:'A tiny fishing island where cats outnumber humans more than 10 to 1.',tags:['animals','places']},
+ {id:'tunguska',t:'The Tunguska Event',y:1908,lat:60.9,lon:101.9,place:'Siberia, Russia',s:'An explosion flattened 80 million trees across 2,000 km². No crater was ever found.',tags:['mystery','space']},
+ {id:'carrington',t:'The Carrington Event',y:1859,lat:51.5,lon:-0.1,place:'London, UK',s:'A solar storm made telegraph lines spark and work even while unplugged. Auroras were seen in the Caribbean.',tags:['space','industrial']},
+ {id:'antikythera',t:'The Antikythera Mechanism',y:-100,lat:35.9,lon:23.3,place:'Antikythera, Greece',s:'A bronze gear computer from 2,000 years ago that predicted eclipses.',tags:['mystery','ancient']},
+ {id:'cleo',t:'Cleopatra & the Moon Landing',y:-69,lat:31.2,lon:29.9,place:'Alexandria, Egypt',s:'Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid.',tags:['ancient','space']},
+ {id:'starfish',t:'Starfish Prime',y:1962,lat:16.7,lon:-169.5,place:'Johnston Atoll, Pacific',s:'The US detonated a nuke in space, creating artificial auroras and knocking out streetlights in Hawaii.',tags:['military','space']},
+ {id:'bloop',t:'The Bloop',y:1997,lat:-50,lon:-100,place:'South Pacific',s:'An ultra-loud underwater sound baffled scientists for years. Probably an icequake… probably.',tags:['mystery','ocean']},
+ {id:'kentucky',t:'The Kentucky Meat Shower',y:1876,lat:38,lon:-84,place:'Kentucky, USA',s:'Chunks of meat fell from a clear sky. The leading theory: vultures vomiting mid-flight.',tags:['animals','mystery']},
+ {id:'tulip',t:'Tulip Mania',y:1637,lat:52.4,lon:4.9,place:'Amsterdam, Netherlands',s:'A single tulip bulb sold for more than a canal house.',tags:['economy','places']},
+ {id:'baghdad',t:'The Baghdad Battery',y:-200,lat:33.3,lon:44.4,place:'Near Baghdad, Iraq',s:'Clay jars with copper and iron inside — possibly ancient batteries, or possibly scroll holders.',tags:['ancient','mystery']},
+ {id:'zone',t:'Zone of Silence',y:1970,lat:26.7,lon:-103.7,place:'Durango, Mexico',s:'A desert patch where radios supposedly fail and a US test rocket crashed in 1970.',tags:['mystery','places']},
+ {id:'nazca',t:'The Nazca Lines',y:-300,lat:-14.7,lon:-75.1,place:'Nazca, Peru',s:'Giant animal drawings in the desert, only fully visible from the sky.',tags:['ancient','places']},
+];
+const $=s=>document.querySelector(s);
+const xy=(lat,lon)=>[(lon+180)/360*1000,(90-lat)/180*500];
+// grid
+let g='';for(let x=0;x<=1000;x+=50)g+=`<line class="gridline" x1="${x}" y1="0" x2="${x}" y2="500"/>`;for(let y=0;y<=500;y+=50)g+=`<line class="gridline" x1="0" y1="${y}" x2="1000" y2="${y}"/>`;$('#grid').innerHTML=g;
+// discovery rhumb lines
+let r='';[[300,250],[700,280]].forEach(([cx,cy])=>{for(let a=0;a<360;a+=22.5){const rad=a*Math.PI/180;r+=`<line class="gridline" style="stroke:var(--accent);opacity:.35" x1="${cx}" y1="${cy}" x2="${cx+Math.cos(rad)*600}" y2="${cy+Math.sin(rad)*600}"/>`}r+=`<text x="${cx-12}" y="${cy+10}" font-size="28">🧭</text>`});r+='<text x="380" y="330" font-size="30">⛵</text>';$('#d-discovery').innerHTML=r;
+$('#d-victorian').innerHTML='<path d="M195,110 Q330,90 490,115 T760,160" fill="none" stroke="var(--accent)" stroke-dasharray="4 4" stroke-width="1.5"/><text x="300" y="175" font-family="Playfair Display" font-size="12" fill="var(--ink)" opacity=".6">TRANSATLANTIC TELEGRAPH</text>';
+let dg='';for(let i=0;i<40;i++){dg+=`<circle cx="${Math.random()*1000}" cy="${Math.random()*500}" r="1.2" fill="var(--landStroke)" opacity="${Math.random()}"/>`}$('#d-digital').innerHTML=dg;
+// markers
+$('#markers').innerHTML=ODD.map(o=>{const[x,y]=xy(o.lat,o.lon);return`<g class="marker" data-id="${o.id}" transform="translate(${x} ${y})"><circle class="halo" r="6"/><circle class="dot" r="5"/><title>${o.t} (${fmt(o.y)})</title></g>`}).join('');
+function fmt(y){return y<0?`${-y} BCE`:`${y} CE`}
+// epochs
+$('#epochs').innerHTML=ERAS.map(e=>`<button data-j="${e.jump}">${e.name}</button>`).join('');
+let cur=null;
+function setYear(y,anim){
+  y=+y;$('#slider').value=y;$('#year').textContent=fmt(y);
+  const era=ERAS.find(e=>y>=e.from&&y<=e.to)||ERAS[0];
+  if(era!==cur){cur=era;const root=document.documentElement.style;for(const[k,v]of Object.entries(era.v))root.setProperty('--'+k,v);
+    ERAS.forEach(e=>$('#d-'+e.id).classList.toggle('on',e===era));
+    document.querySelectorAll('#epochs button').forEach((b,i)=>b.classList.toggle('active',ERAS[i]===era));
+    $('#eraLabel').innerHTML=`${era.name}<span>${fmt(era.from)} – ${fmt(era.to)}</span>`;updateSound();}
+  document.querySelectorAll('.marker').forEach(m=>{const o=ODD.find(o=>o.id===m.dataset.id);m.classList.toggle('dim',!(o.y>=era.from&&o.y<=era.to))});
+}
+function animateTo(target){const start=+$('#slider').value,t0=performance.now();(function step(t){const p=Math.min(1,(t-t0)/900),e=1-Math.pow(1-p,3);setYear(Math.round(start+(target-start)*e));if(p<1)requestAnimationFrame(step)})(t0)}
+$('#slider').oninput=e=>setYear(e.target.value);
+$('#epochs').onclick=e=>{if(e.target.dataset.j)animateTo(+e.target.dataset.j)};
+// dossier
+const votes={};
+function open(o){
+  animateTo(o.y);const[x,y]=xy(o.lat,o.lon);flyTo(x,y,2.2);
+  votes[o.id]=votes[o.id]||{b:20+Math.floor(Math.random()*80),w:10+Math.floor(Math.random()*50),q:5+Math.floor(Math.random()*30)};const v=votes[o.id];
+  const related=ODD.filter(p=>p!==o&&p.tags.some(t=>o.tags.includes(t))).slice(0,4);
+  $('#dossier').innerHTML=`<div class="meta">Dossier · ${fmt(o.y)}</div><h2>${o.t}</h2><div class="meta">📍 ${o.place}</div><p style="font-size:18px;line-height:1.5">${o.s}</p>
+   <div class="reacts"><button data-r="b">🤯 ${v.b}</button><button data-r="w">🧐 ${v.w}</button><button data-r="q">❓ ${v.q}</button></div>
+   <div class="meta">Tags: ${o.tags.join(', ')}</div><h3 style="font-family:var(--font)">Rabbit hole →</h3><div class="tags">${related.map(p=>`<button data-go="${p.id}">${p.t}</button>`).join('')}</div>`;
+  $('#dossier').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.r){v[b.dataset.r]++;open.skip=true;b.textContent=b.textContent.replace(/\d+/,v[b.dataset.r]);blip()}if(b.dataset.go)open(ODD.find(p=>p.id===b.dataset.go))};
+  $('#drawer').classList.add('open');blip();
+}
+$('#close').onclick=()=>$('#drawer').classList.remove('open');
+$('#markers').addEventListener('click',e=>{const m=e.target.closest('.marker');if(m&&!moved)open(ODD.find(o=>o.id===m.dataset.id))});
+$('#random').onclick=()=>open(ODD[Math.floor(Math.random()*ODD.length)]);
+// pan & zoom
+const svg=$('#map'),world=$('#world');let view={x:0,y:0,k:1},moved=false;
+function apply(){world.setAttribute('transform',`translate(${view.x} ${view.y}) scale(${view.k})`)}
+function toSvg(cx,cy){const p=svg.createSVGPoint();p.x=cx;p.y=cy;return p.matrixTransform(svg.getScreenCTM().inverse())}
+function zoomAt(px,py,next){next=Math.max(1,Math.min(8,next));const k=next/view.k;view.x=px-(px-view.x)*k;view.y=py-(py-view.y)*k;view.k=next;apply()}
+svg.addEventListener('wheel',e=>{e.preventDefault();const dy=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?100:1);const p=toSvg(e.clientX,e.clientY);zoomAt(p.x,p.y,view.k*Math.exp(-dy*.0015))},{passive:false});
+let drag=null;
+svg.addEventListener('pointerdown',e=>{drag={p:toSvg(e.clientX,e.clientY),x:view.x,y:view.y};moved=false});
+window.addEventListener('pointermove',e=>{if(!drag)return;const p=toSvg(e.clientX,e.clientY);const dx=p.x-drag.p.x,dy=p.y-drag.p.y;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;view.x=drag.x+dx;view.y=drag.y+dy;apply()});
+window.addEventListener('pointerup',()=>{drag=null;setTimeout(()=>moved=false,0)});
+$('#zin').onclick=()=>zoomAt(500,250,view.k*1.4);$('#zout').onclick=()=>zoomAt(500,250,view.k/1.4);$('#zreset').onclick=()=>{view={x:0,y:0,k:1};apply()};
+function flyTo(x,y,k){const s={...view},t={k,x:500-x*k,y:250-y*k},t0=performance.now();(function st(t1){const p=Math.min(1,(t1-t0)/800),e=1-Math.pow(1-p,3);view={k:s.k+(t.k-s.k)*e,x:s.x+(t.x-s.x)*e,y:s.y+(t.y-s.y)*e};apply();if(p<1)requestAnimationFrame(st)})(t0)}
+// sound
+let ctx=null,nodes=[],on=false,tick=null;
+function stopSound(){nodes.forEach(n=>{try{n.stop()}catch{}});nodes=[];clearInterval(tick)}
+function tone(f,type,g,dur){if(!ctx)return;const o=ctx.createOscillator(),a=ctx.createGain();o.type=type;o.frequency.value=f;a.gain.setValueAtTime(g,ctx.currentTime);a.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+dur);o.connect(a).connect(ctx.destination);o.start();o.stop(ctx.currentTime+dur)}
+function noise(gain,freq){const b=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=ctx.createBufferSource();s.buffer=b;s.loop=true;const f=ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=freq;const g=ctx.createGain();g.gain.value=gain;s.connect(f).connect(g).connect(ctx.destination);s.start();nodes.push(s)}
+function drone(f,type,gain){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=f;g.gain.value=gain;o.connect(g).connect(ctx.destination);o.start();nodes.push(o)}
+function updateSound(){if(!on||!ctx)return;stopSound();const id=cur.id;
+ if(id==='ancient'){noise(.05,400);tick=setInterval(()=>tone(220,'sine',.15,3),4000)}
+ if(id==='discovery'){noise(.06,700);tick=setInterval(()=>tone(90+Math.random()*30,'triangle',.08,.6),2500)}
+ if(id==='victorian'){noise(.015,3000);tick=setInterval(()=>tone(1800,'square',.03,.04),500)}
+ if(id==='coldwar'){noise(.02,5000);tick=setInterval(()=>tone(1200,'sine',.1,.8),3000)}
+ if(id==='digital'){drone(55,'sawtooth',.02);drone(82.5,'sine',.03);tick=setInterval(()=>tone(2000+Math.random()*1500,'sine',.03,.1),1200)}}
+function blip(){if(on)tone(660,'sine',.08,.25)}
+$('#sound').onclick=()=>{on=!on;if(on&&!ctx)ctx=new AudioContext();$('#sound').textContent=on?'🔊 Sound on':'🔇 Sound off';if(on)updateSound();else stopSound()};
+setYear(1518);
+</script>
+</body>
+</html>
