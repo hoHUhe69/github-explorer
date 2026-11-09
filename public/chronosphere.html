@@ -19,7 +19,8 @@
   main{position:relative;height:calc(100% - 64px - 110px)}
   #map{width:100%;height:100%;cursor:grab;touch-action:none;display:block}
   #map:active{cursor:grabbing}
-  .land{fill:var(--land);stroke:var(--landStroke);stroke-width:1.2;transition:fill .8s,stroke .8s}
+  .land:hover{filter:brightness(1.15)}
+  .land{fill:var(--land);stroke:var(--landStroke);stroke-width:.7;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .8s,stroke .8s}
   .sea{fill:var(--sea);transition:fill .8s}
   .gridline{stroke:var(--grid);stroke-width:.6;fill:none}
   .marker{cursor:pointer;transition:opacity .4s}
@@ -351,6 +352,42 @@ const ODD=[
  {id:'baghdad',t:'The Baghdad Battery',y:-200,lat:33.3,lon:44.4,place:'Near Baghdad, Iraq',s:'Clay jars with copper and iron inside — possibly ancient batteries, or possibly scroll holders.',tags:['ancient','mystery']},
  {id:'zone',t:'Zone of Silence',y:1970,lat:26.7,lon:-103.7,place:'Durango, Mexico',s:'A desert patch where radios supposedly fail and a US test rocket crashed in 1970.',tags:['mystery','places']},
  {id:'nazca',t:'The Nazca Lines',y:-300,lat:-14.7,lon:-75.1,place:'Nazca, Peru',s:'Giant animal drawings in the desert, only fully visible from the sky.',tags:['ancient','places']},
+ {id:'pyramid',t:'Pyramid Builders Got Beer',y:-2560,lat:29.98,lon:31.13,place:'Giza, Egypt',s:'Workers on the Great Pyramid were paid partly in beer — about 4–5 litres a day.',tags:['ancient','food']},
+ {id:'mammoth',t:'Mammoths Outlived the Pyramids',y:-1650,lat:71.2,lon:-179.5,place:'Wrangel Island, Russia',s:'Woolly mammoths still lived here while the pyramids of Egypt were already standing.',tags:['animals','ancient']},
+ {id:'urine',t:'Roman Urine Tax',y:70,lat:41.9,lon:12.5,place:'Rome, Italy',s:'Emperor Vespasian taxed public urine, which was collected to clean togas. "Money does not stink."',tags:['ancient','economy']},
+ {id:'terracotta',t:'The Terracotta Army',y:-210,lat:34.38,lon:109.27,place:"Xi'an, China",s:'8,000 life-size clay soldiers, each with a unique face, buried to guard an emperor in the afterlife.',tags:['ancient','military']},
+ {id:'olympics',t:'Naked Ancient Olympics',y:-776,lat:37.64,lon:21.63,place:'Olympia, Greece',s:'Athletes competed fully naked, and married women were banned from watching.',tags:['ancient','sports']},
+ {id:'stonehenge',t:'Stonehenge Sold at Auction',y:-2500,lat:51.18,lon:-1.83,place:'Wiltshire, England',s:'Built ~2500 BCE — and in 1915 a man bought it at auction for his wife. She did not like it.',tags:['ancient','places']},
+ {id:'popes',t:'The Cadaver Synod',y:897,lat:41.9,lon:12.45,place:'Vatican, Rome',s:'Pope Stephen VI dug up his dead predecessor, dressed the corpse and put it on trial. It lost.',tags:['medieval','mystery']},
+ {id:'vikings',t:'Vikings in America',y:1000,lat:51.6,lon:-55.5,place:"L'Anse aux Meadows, Canada",s:'Leif Erikson reached North America almost 500 years before Columbus.',tags:['medieval','exploration']},
+ {id:'mansa',t:'Richest Man Ever',y:1324,lat:16.77,lon:-3.0,place:'Timbuktu, Mali',s:"Mansa Musa gave away so much gold on his pilgrimage that he crashed Egypt's economy for a decade.",tags:['economy','medieval']},
+ {id:'pigtrial',t:'A Pig on Trial',y:1386,lat:48.9,lon:0.2,place:'Falaise, France',s:'A pig was put on trial for murder, dressed in clothes, found guilty and publicly executed.',tags:['animals','medieval']},
+ {id:'ketchup',t:'Ketchup as Medicine',y:1834,lat:41.5,lon:-81.7,place:'Ohio, USA',s:'Tomato ketchup was sold as pills to cure indigestion and diarrhea.',tags:['food','industrial']},
+ {id:'krakatoa',t:'The Loudest Sound Ever',y:1883,lat:-6.1,lon:105.4,place:'Krakatoa, Indonesia',s:'The eruption was heard 4,800 km away and its pressure wave circled Earth seven times.',tags:['disaster','places']},
+ {id:'eiffel',t:'Eiffel Tower For Sale',y:1925,lat:48.86,lon:2.29,place:'Paris, France',s:'Con man Victor Lustig "sold" the Eiffel Tower to scrap dealers — twice.',tags:['economy','industrial']},
+ {id:'mummies',t:'Mummy Paint & Mummy Medicine',y:1600,lat:51.5,lon:-0.13,place:'London, UK',s:'Europeans ground up Egyptian mummies to eat as medicine and to make a brown paint.',tags:['ancient','food']},
+ {id:'pirate',t:'Pirate Democracy',y:1720,lat:25.06,lon:-77.34,place:'Nassau, Bahamas',s:'Pirate crews voted for captains, shared loot equally and had injury insurance.',tags:['economy','ocean']},
+ {id:'chess',t:'The Mechanical Turk',y:1770,lat:48.2,lon:16.37,place:'Vienna, Austria',s:'A "chess-playing robot" beat Napoleon and Ben Franklin. A human was hiding inside.',tags:['mystery','industrial']},
+ {id:'shortwar',t:'The Shortest War',y:1896,lat:-6.16,lon:39.19,place:'Zanzibar',s:'Britain vs Zanzibar lasted 38–45 minutes.',tags:['military','places']},
+ {id:'dogsoldier',t:'Sergeant Stubby',y:1918,lat:49.2,lon:5.4,place:'Western Front, France',s:'A stray dog became a decorated WWI sergeant after capturing a German spy.',tags:['animals','military']},
+ {id:'ghostarmy',t:'The Ghost Army',y:1944,lat:49.4,lon:-0.6,place:'Normandy, France',s:'Artists used inflatable tanks and fake radio chatter to fool the enemy.',tags:['military','mystery']},
+ {id:'laika',t:'Laika in Orbit',y:1957,lat:45.9,lon:63.3,place:'Baikonur, Kazakhstan',s:'A Moscow street dog became the first animal to orbit Earth.',tags:['animals','space']},
+ {id:'acoustic',t:'Acoustic Kitty',y:1966,lat:38.95,lon:-77.15,place:'Langley, USA',s:'The CIA spent millions turning a cat into a spy microphone. It wandered off.',tags:['animals','military']},
+ {id:'pigeon',t:'Project Pigeon',y:1943,lat:42.37,lon:-71.1,place:'Massachusetts, USA',s:'B.F. Skinner trained pigeons to steer missiles by pecking at a screen.',tags:['animals','military']},
+ {id:'moonbuggy',t:'Golf on the Moon',y:1971,lat:26.1,lon:3.6,place:'Fra Mauro (launched from Earth)',s:'Alan Shepard hit two golf balls on the Moon with a smuggled club.',tags:['space','sports']},
+ {id:'door',t:'The Door to Hell',y:1971,lat:40.25,lon:58.44,place:'Darvaza, Turkmenistan',s:'Scientists set a gas crater on fire expecting it to burn out in days. It burned for 50+ years.',tags:['places','disaster']},
+ {id:'wow',t:'The Wow! Signal',y:1977,lat:40.07,lon:-83.07,place:'Ohio, USA',s:'A 72-second radio signal from space so strong an astronomer wrote "Wow!" next to it. Never heard again.',tags:['space','mystery']},
+ {id:'whale',t:'Exploding Whale',y:1970,lat:44.0,lon:-124.1,place:'Florence, Oregon',s:'Officials blew up a dead whale with dynamite. Blubber rained down on cars hundreds of metres away.',tags:['animals','disaster']},
+ {id:'hans',t:'Hans Island Whisky War',y:2005,lat:80.8,lon:-66.5,place:'Hans Island, Arctic',s:'Canada and Denmark "fought" over a rock by leaving each other whisky and schnapps. Settled 2022.',tags:['military','places']},
+ {id:'bananas',t:'Radioactive Bananas',y:1995,lat:9.75,lon:-83.75,place:'Costa Rica',s:'Bananas are slightly radioactive. You would need to eat about 10 million at once for it to hurt.',tags:['food','space']},
+ {id:'mike',t:'Mike the Headless Chicken',y:1945,lat:39.08,lon:-108.55,place:'Colorado, USA',s:'A chicken lived 18 months after its head was cut off, and toured the country.',tags:['animals','mystery']},
+ {id:'elevator',t:'Pink Lake Hillier',y:2012,lat:-34.1,lon:123.2,place:'Western Australia',s:'A bubblegum-pink lake caused by salt-loving algae.',tags:['places','ocean']},
+ {id:'penguin',t:'Sir Nils Olav',y:2008,lat:55.94,lon:-3.27,place:'Edinburgh, Scotland',s:'A king penguin was knighted by the Norwegian King\'s Guard. He outranks most soldiers.',tags:['animals','military']},
+ {id:'bitcoin',t:'The $600 Million Pizza',y:2010,lat:26.12,lon:-80.14,place:'Florida, USA',s:'Someone paid 10,000 bitcoin for two pizzas — worth hundreds of millions today.',tags:['economy','food']},
+ {id:'lightning',t:'Endless Lightning',y:2014,lat:9.5,lon:-71.5,place:'Lake Maracaibo, Venezuela',s:'Lightning strikes here up to 260 nights a year, sometimes 28 times per minute.',tags:['places','mystery']},
+ {id:'saharaSnow',t:'Snow in the Sahara',y:2018,lat:32.9,lon:0.6,place:'Ain Sefra, Algeria',s:'Snow covered the sand dunes of the world\'s hottest desert.',tags:['places','disaster']},
+ {id:'rats',t:'Hero Rats',y:2020,lat:13.36,lon:103.86,place:'Siem Reap, Cambodia',s:'Magawa, a giant rat, sniffed out 100+ landmines and won a gold medal.',tags:['animals','military']},
+ {id:'ozymandias',t:'Brazil\'s Snake Island',y:2000,lat:-24.48,lon:-46.67,place:'Ilha da Queimada Grande, Brazil',s:'So full of venomous golden lancehead vipers that visiting is banned.',tags:['animals','places']},
 ];
 const $=s=>document.querySelector(s);
 const xy=(lat,lon)=>[(lon+180)/360*1000,(90-lat)/180*500];
