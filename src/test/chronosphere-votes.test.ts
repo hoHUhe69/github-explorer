@@ -75,8 +75,10 @@ describe("emoji reactions", () => {
       pretendToBeVisual: true,
       url: "http://localhost/",
       storageQuota: 10_000,
+      beforeParse(win) {
+        win.localStorage.setItem("chronosphere:myvotes", stored!);
+      },
     });
-    second.window.localStorage.setItem("chronosphere:myvotes", stored!);
     const doc = second.window.document;
     doc
       .querySelector<HTMLElement>("#markers .marker")!
