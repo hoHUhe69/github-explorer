@@ -49,10 +49,10 @@ function loadMap(file: string, savedLanguage?: string) {
   };
   translationWindow.googleTranslateElementInit();
 
-  function choose(language: string) {
+  const choose = (language: string) => {
     selector.value = language;
     selector.dispatchEvent(new app.window.Event("change", { bubbles: true }));
-  }
+  };
 
   return { app, document, selector, requestedLanguages, choose };
 }
