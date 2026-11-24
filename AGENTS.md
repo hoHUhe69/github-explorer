@@ -30,3 +30,4 @@ use the editor.
 <!-- LOVABLE:END -->
 
 - Root `index.html` is an exact copy of `public/chronosphere.html` for GitHub Pages; update both together.
+- Keep the preview route as a thin iframe wrapper; the standalone HTML owns language selection so preview and GitHub Pages share one translation implementation.
