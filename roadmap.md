@@ -1,5 +1,6 @@
-# Preview repair
+# Fact card updates
 
-- [x] Remove the duplicate preview-only language switch while preserving the standalone map's English/Slovak control.
-- [x] Remove the unsupported preview configuration option.
-- [x] Verify the map, language switching, reactions, and current preview diagnostics.
+- [ ] Remove emoji reactions and their counters from every fact card.
+- [ ] Add a verified reference link for each of the 53 facts.
+- [ ] Keep the standalone map and GitHub Pages copy identical, preserving both languages.
+- [ ] Verify fact navigation, source links, bilingual controls, and preview diagnostics.
